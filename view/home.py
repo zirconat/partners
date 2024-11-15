@@ -259,22 +259,22 @@ def display_employee_card(employee_data,index):
                 cancelled = st.form_submit_button("Cancel")
 
                 if submitted:
-                    df.at[index, "Name"] = new_name
-                    df.at[index, "Designation"] = new_designation
+                    df.at[index, "Name"] = str(new_name)
+                    df.at[index, "Designation"] = str(new_designation)
                     df.at[index, "Contact No."] = int(new_contact)
-                    df.at[index, "Vehicle"] = new_vehicle
-                    df.at[index, "Address"] = new_address
+                    df.at[index, "Vehicle"] = str(new_vehicle)
+                    df.at[index, "Address"] = str(new_address)
                     df.at[index, "Posting Date"] = new_posting_date
                     df.at[index, "De-posted Date"] = new_depost_date
-                    df.at[index, "Golf"] = new_golf
-                    df.at[index, "Golf Handicap"] = new_golf_handicap
-                    df.at[index, "Dietary Restriction"] = new_dietary
-                    df.at[index, "Reception"] = new_reception
-                    df.at[index, "Festivity"] = new_festivity
-                    df.at[index, "Interests"] = new_interest
-                    df.at[index, "Tier"] = new_tier
-                    df.at[index, "BigS/SmallS"] = new_sip
-                    df.at[index, "Status"] = new_status
+                    df.at[index, "Golf"] = str(new_golf)
+                    df.at[index, "Golf Handicap"] = str(new_golf_handicap)
+                    df.at[index, "Dietary Restriction"] = str(new_dietary)
+                    df.at[index, "Reception"] = str(new_reception)
+                    df.at[index, "Festivity"] = str(new_festivity)
+                    df.at[index, "Interests"] = str(new_interest)
+                    df.at[index, "Tier"] = str(new_tier)
+                    df.at[index, "BigS/SmallS"] = str(new_sip)
+                    df.at[index, "Status"] = str(new_status)
                  
                     df.to_excel("partners.xlsx", index=True)
                     st.success("Employee information updated successfully!")
@@ -296,6 +296,7 @@ def display_employee_cards(df):
 # Display the filtered DataFrame
 with st.expander("List view"):
     #st.write(filtered_df.drop('ID', axis=1))
+    filtered_df['Contact No.'] = filtered_df['Contact No.'].astype(str).str.replace(',', '')
     st.write(filtered_df)
 
 # Display filtered or unfiltered data
