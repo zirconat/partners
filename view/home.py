@@ -275,30 +275,12 @@ def display_employee_card(employee_data,index):
                     df.at[index, "Tier"] = new_tier
                     df.at[index, "BigS/SmallS"] = new_sip
                     df.at[index, "Status"] = new_status
-                    
-                    # updates = { # currently not working as well
-                    #     "Name": new_name,
-                    #     "Designation": new_designation,
-                    #     "Contact No.": new_contact,
-                    #     "Vehicle": new_vehicle,
-                    #     "Address": new_address,
-                    #     "Posting Date": new_posting_date,
-                    #     "De-posted Date": new_depost_date,
-                    #     "Golf": new_golf,
-                    #     "Golf Handicap": new_golf_handicap,
-                    #     "Dietary Restrictions": new_dietary,
-                    #     "Reception": ", ".join(new_reception), # convert list to string format
-                    #     "Festivity": ", ".join(new_festivity),
-                    #     "Interests": new_interest,
-                    #     "Tier": new_tier,
-                    #     "BigS/SmallS": ", ".join(new_sip),
-                    #     "Status": new_status
-                    # }
-                    #df.loc[{index}] = updates
+                 
                     df.to_excel("partners.xlsx", index=True)
                     st.success("Employee information updated successfully!")
                     st.session_state[f"edit_mode_{index}"] = False    
                     st.rerun()
+                    
                 if cancelled:
                     st.session_state[f"edit_mode_{index}"]=False
                     st.rerun()
