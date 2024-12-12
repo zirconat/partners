@@ -179,30 +179,30 @@ def display_employee_card(employee_data,index):
                     <div style="float: right; background-color: {get_tier_color(employee_data['Tier'])}; color: white; padding: 5px 10px; border-radius: 5px;">
                         <b>Tier: </b>{employee_data['Tier']}
                     </div>
-                    <p style="font-weight: bold; font-size: 25px;">
+                    <p style="font-weight: bold; font-size: 25px; color: black;">
                         {employee_data['Name']} ({employee_data['Designation']}), {employee_data['Company']}    
                     </p>
                     <div style="display: flex; flex-wrap: wrap;">
                         <div style="flex: 1; margin-right: 10px;">
-                            <p><b>Country:</b><br>{employee_data['Country']}</p>
-                            <p><b>Contact No.:</b><br> {int(employee_data['Contact No.'])}</p>
-                            <p><b>Vehicle(s):</b><br> {employee_data['Vehicle']}</p>
-                            <p><b>Address:</b><br> {employee_data['Address']}</p>
+                            <p style="color: black;"><b>Country:</b><br>{employee_data['Country']}</p>
+                            <p style="color: black;"><b>Contact No.:</b><br> {int(employee_data['Contact No.'])}</p>
+                            <p style="color: black;"><b>Vehicle(s):</b><br> {employee_data['Vehicle']}</p>
+                            <p style="color: black;"><b>Address:</b><br> {employee_data['Address']}</p>
                         </div>
                         <div style="flex: 1; margin-right: 10px;">
-                            <p><b>Posting Date:</b><br> {formatted_posting_date}</p>
-                            <p><b>De-posted Date:</b><br> {formatted_deposted_date}</p>
-                            <p><b>Golf:</b><br> {employee_data['Golf']}</p>
-                            <p><b>Golf Handicap:</b><br> {employee_data['Golf Handicap']}</p>
+                            <p style="color: black;"><b>Posting Date:</b><br> {formatted_posting_date}</p>
+                            <p style="color: black;"><b>De-posted Date:</b><br> {formatted_deposted_date}</p>
+                            <p style="color: black;"><b>Golf:</b><br> {employee_data['Golf']}</p>
+                            <p style="color: black;"><b>Golf Handicap:</b><br> {employee_data['Golf Handicap']}</p>
                         </div>
                         <div style="flex: 1; margin-right: 10px;">
-                            <p><b>Dietary Restrictions:</b><br> {employee_data['Dietary Restrictions']}</p>
-                            <p><b>Reception:</b><br> {employee_data['Reception']}</p>
-                            <p><b>Festivity:</b><br> {employee_data['Festivity']}</p>
+                            <p style="color: black;"><b>Dietary Restrictions:</b><br> {employee_data['Dietary Restrictions']}</p>
+                            <p style="color: black;"><b>Reception:</b><br> {employee_data['Reception']}</p>
+                            <p style="color: black;"><b>Festivity:</b><br> {employee_data['Festivity']}</p>
                         </div>
                         <div style="flex: 1; margin-right: 10px;">
-                            <p><b>BigS/SmallS:</b><br> {employee_data['BigS/SmallS']}</p>
-                            <p><b>Interest(s):</b><br> {employee_data['Interests']} </p>
+                            <p style="color: black;"><b>BigS/SmallS:</b><br> {employee_data['BigS/SmallS']}</p>
+                            <p style="color: black;"><b>Interest(s):</b><br> {employee_data['Interests']} </p>
                         </div>
                     </div>
                 </div>
@@ -284,7 +284,25 @@ def display_employee_card(employee_data,index):
                 if cancelled:
                     st.session_state[f"edit_mode_{index}"]=False
                     st.rerun()
-            
+
+def get_current_timestamp():
+    return datetime.now().strftime("%Y-%m-%d at %H:%M hrs")
+
+# Status timestamp
+last_modified_by = "-" # Placeholder for username
+last_modified_info = "-" # Placeholder for edited information details
+last_modified_at = get_current_timestamp()
+
+# Display status timestamp
+# st.markdown(
+#     f"""
+#     <p style="color: gray; margin-top: 0;"><i>
+#         Last Modified: {last_modified_at} by {last_modified_by}. Info edited: ({last_modified_info})
+#     </p></i>
+#     """, 
+#     unsafe_allow_html=True
+# )
+
 # Display number of employee cards shown
 def display_employee_cards(df):
     num_cards = len(filtered_df)
