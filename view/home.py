@@ -172,7 +172,7 @@ def display_employee_card(employee_data,index):
                 
             st.markdown(
                 f"""
-                <div style="border-radius: 10px; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; background-color: #f9f9f9;">
+                <div style="border-radius: 10px; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; background-color: #f9f9f9; display: flex"> <div style="flex: 0 0 150px; margin-right: 10px;">  {display_photo(employee_data)}  </div>
                     <div style="float: right; background-color: {get_status_color(employee_data['Status'])}; color: white; padding: 5px 10px; border-radius: 5px;">
                         {employee_data['Status']}
                     </div>
