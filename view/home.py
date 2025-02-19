@@ -320,10 +320,10 @@ def display_photo(employee_data):
             return st.image(img_bytes, width = 150)
         except Exception as e:
             st.error(f"Error displaying image: {e}")
-            return st.image("placeholder.png", width = 150) # Placeholder image
+            return st.image("👤", width = 150) # Placeholder image
     
     else:
-        return st.image("placeholder.png", width = 150) # Placeholder image
+        return st.image("👤", width = 150) # Placeholder image
 
 # End of display photo segment
 
