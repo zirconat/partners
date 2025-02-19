@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from PIL import Image #for display photo
+import io
 
 st.title("🔍 Partners")
 st.write(
@@ -302,6 +304,29 @@ last_modified_at = get_current_timestamp()
 #     """, 
 #     unsafe_allow_html=True
 # )
+
+# New addition - Display photo segment
+def display_photo(employee_data):
+    photo_path = employee_data.get('Photo', None) # Assuming 'Photo' is the column name
+
+    if photo_path and photo_path != 'Nil':
+        try:
+            # Try opening the image using PIL to handle various image formats
+            image = Image.open(photo_path)
+            # Convert to bytes for Streamlit
+            img_bytes = io.BytesIO()
+            image.save(img_bytes, format=image.format or "JPEG") # Save in original format or JPEG
+            img_bytes = img_bytes.getvalue()
+            return st.image(img_bytes, width = 150)
+        except Exception as e:
+            st.error(f"Error displaying image: {e}")
+            return st.image("placeholder.png", width = 150) # Placeholder image
+    
+    else:
+        return st.image("placeholder.png", width = 150) # Placeholder image
+
+# End of display photo segment
+
 
 # Display number of employee cards shown
 def display_employee_cards(df):
