@@ -3,6 +3,9 @@ import pandas as pd
 from datetime import datetime
 from PIL import Image #for display photo
 import io
+import base64
+from pathlib import Path
+import os
 
 st.title("🔍 Partners")
 st.write(
@@ -42,6 +45,10 @@ df = pd.read_excel("partners.xlsx", index_col=0) # Set the first column as index
 # Reset the index, start from 1
 df = df.reset_index(drop=True)
 df.index += 1 # Add 1 to each index
+
+# Ensure 'images' folder exists
+if not os.path.exists("images"):
+    os.makedirs("images")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -117,8 +124,8 @@ st.download_button(
 def toggle_edit_mode(index):
     st.session_state[f"edit_mode_{index}"] = not st.session_state[f"edit_mode_{index}"]
 
+# Define color mappings for different tiers
 def get_tier_color(tier):
-    # Define color mappings for different tiers
     tier_colors = {
         "A+": "green",
         "A": "blue",
@@ -128,6 +135,7 @@ def get_tier_color(tier):
     }
     return tier_colors.get(tier, "gray")  # Default color for unknown tiers
 
+# Define status colour for Active and Deposted
 def get_status_color(status):
     return "green" if status == "Active" else "red"
 
@@ -163,48 +171,62 @@ def display_employee_card(employee_data,index):
             else:
                 formatted_deposted_date = deposted_date.strftime('%Y-%m-%d')
 
+        # Ensure the image path is valid
+        image_path = employee_data['Photo'] if pd.notnull(employee_data['Photo']) and os.path.exists(employee_data['Photo']) else "placeholder.jpg"
+
+            
         # Flag to track edit mode
         if f"edit_mode_{index}" not in st.session_state:
             st.session_state[f"edit_mode_{index}"] = False
         
         # Read-only mode by default
         if not st.session_state[f"edit_mode_{index}"]:
-                
+
+            with open(image_path, "rb") as f:
+                image_data = f.read()
+                image_base64 = base64.b64encode(image_data).decode("utf-8")
+            
             st.markdown(
                 f"""
-                <div style="border-radius: 10px; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; background-color: #f9f9f9; display: flex"> <div style="flex: 0 0 150px; margin-right: 10px;">  {display_photo(employee_data)}  </div>
-                    <div style="float: right; background-color: {get_status_color(employee_data['Status'])}; color: white; padding: 5px 10px; border-radius: 5px;">
-                        {employee_data['Status']}
-                    </div>
-                    <div style="float: right; color: white; padding: 5px 10px; border-radius: 5px;">
-                    </div>
-                    <div style="float: right; background-color: {get_tier_color(employee_data['Tier'])}; color: white; padding: 5px 10px; border-radius: 5px;">
-                        <b>Tier: </b>{employee_data['Tier']}
-                    </div>
-                    <p style="font-weight: bold; font-size: 25px; color: black;">
-                        {employee_data['Name']} ({employee_data['Designation']}), {employee_data['Company']}    
-                    </p>
-                    <div style="display: flex; flex-wrap: wrap;">
-                        <div style="flex: 1; margin-right: 10px;">
-                            <p style="color: black;"><b>Country:</b><br>{employee_data['Country']}</p>
-                            <p style="color: black;"><b>Contact No.:</b><br> {int(employee_data['Contact No.'])}</p>
-                            <p style="color: black;"><b>Vehicle(s):</b><br> {employee_data['Vehicle']}</p>
-                            <p style="color: black;"><b>Address:</b><br> {employee_data['Address']}</p>
+                <div style="border-radius: 10px; border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <img src="data:image/png;base64,{image_base64}" style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;">
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0; font-size: 20px; color: #555;">
+                                {employee_data['Name']} 
+                            </h3>
+                            <i><h4 style="margin: 0; font-size: 16px; color: #555;">
+                                {employee_data['Designation']} , {employee_data['Company']}
+                            </h4></i>
+                        </div>                        
+                        <div style="background-color: {get_tier_color(employee_data['Tier'])}; color: white; padding: 5px 10px; border-radius: 5px; text-align: center;">
+                            <b>Tier:</b> {employee_data['Tier']}
+                        </div>                        
+                        <div style="background-color: {get_status_color(employee_data['Status'])}; color: white; padding: 5px 10px; border-radius: 5px; text-align: center;">
+                            {employee_data['Status']}
                         </div>
-                        <div style="flex: 1; margin-right: 10px;">
-                            <p style="color: black;"><b>Posting Date:</b><br> {formatted_posting_date}</p>
-                            <p style="color: black;"><b>De-posted Date:</b><br> {formatted_deposted_date}</p>
-                            <p style="color: black;"><b>Golf:</b><br> {employee_data['Golf']}</p>
-                            <p style="color: black;"><b>Golf Handicap:</b><br> {employee_data['Golf Handicap']}</p>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
+                        <div style="flex: 1; min-width: 150px; color: #555">
+                            <p><b>Country:</b> {employee_data['Country']}</p>
+                            <p><b>Contact No.:</b> {employee_data['Contact No.']}</p>
+                            <p><b>Vehicle(s):</b> {employee_data['Vehicle']}</p>
+                            <p><b>Address:</b> {employee_data['Address']}</p>
                         </div>
-                        <div style="flex: 1; margin-right: 10px;">
-                            <p style="color: black;"><b>Dietary Restrictions:</b><br> {employee_data['Dietary Restrictions']}</p>
-                            <p style="color: black;"><b>Reception:</b><br> {employee_data['Reception']}</p>
-                            <p style="color: black;"><b>Festivity:</b><br> {employee_data['Festivity']}</p>
+                        <div style="flex: 1; min-width: 150px; color: #555">
+                            <p><b>Posting Date:</b> {formatted_posting_date}</p>
+                            <p><b>De-posted Date:</b> {formatted_deposted_date}</p>
+                            <p><b>Golf:</b> {employee_data['Golf']}</p>
+                            <p><b>Golf Handicap:</b> {employee_data['Golf Handicap']}</p>
                         </div>
-                        <div style="flex: 1; margin-right: 10px;">
-                            <p style="color: black;"><b>BigS/SmallS:</b><br> {employee_data['BigS/SmallS']}</p>
-                            <p style="color: black;"><b>Interest(s):</b><br> {employee_data['Interests']} </p>
+                        <div style="flex: 1; min-width: 150px; color: #555">
+                            <p><b>Dietary Restrictions:</b> {employee_data['Dietary Restrictions']}</p>
+                            <p><b>Reception:</b> {employee_data['Reception']}</p>
+                            <p><b>Festivity:</b> {employee_data['Festivity']}</p>
+                        </div>
+                        <div style="flex: 1; min-width: 150px; color: #555">
+                            <p><b>BigS/SmallS:</b> {employee_data['BigS/SmallS']}</p>
+                            <p><b>Interest(s):</b> {employee_data['Interests']}</p>
                         </div>
                     </div>
                 </div>
@@ -213,30 +235,45 @@ def display_employee_card(employee_data,index):
             )
             st.button(
                 f"Edit {employee_data['Name']}'s info", 
-                key=f"edit_{index}", 
+                key=f"edit_{index}",
                 on_click=lambda: toggle_edit_mode(index),
             )
         else:
             # Edit mode
             with st.form(f"edit_form_{index}"):
+
                 # Create form fields for each detail
-                new_name = st.text_input("Name", value=employee_data['Name'])
+
+                new_photo = st.file_uploader(
+                    "Upload new profile image", type = ["png", "jpg", "jpeg"]
+                )
+                new_name = st.text_input(
+                    "Name", value=employee_data['Name']
+                )
                 new_designation = st.text_input(
                     "Designation", value=employee_data['Designation']
                 )
-                new_status = st.text_input("Status (Active/Deposted)", value=employee_data['Status'])
+                new_status = st.text_input(
+                    "Status (Active/Deposted)", value=employee_data['Status']
+                )
                 new_contact = st.text_input(
                     "Contact No.", value=employee_data['Contact No.']
                 )
-                new_vehicle = st.text_input("Vehicle", value=employee_data['Vehicle'])
-                new_address = st.text_input("Address", value=employee_data['Address'])
+                new_vehicle = st.text_input(
+                    "Vehicle", value=employee_data['Vehicle']
+                )
+                new_address = st.text_input(
+                    "Address", value=employee_data['Address']
+                )
                 new_posting_date = st.date_input(
                     "Posting Date (YYYY/MM/DD)", value=employee_data['Posting Date']
                 )
                 new_depost_date = st.text_input(
                     "De-posted Date (YYYY/MM/DD)", value=employee_data['De-posted Date']
                 )
-                new_golf = st.text_input("Golf", value=employee_data['Golf'])
+                new_golf = st.text_input(
+                    "Golf", value=employee_data['Golf']
+                )
                 new_golf_handicap = st.text_input(
                     "Golf Handicap", value=employee_data['Golf Handicap']
                 )
@@ -252,7 +289,9 @@ def display_employee_card(employee_data,index):
                 new_interest = st.text_input(
                     "Interests", value=employee_data['Interests']
                 )
-                new_tier = st.text_input("Tier (A+, A, B, C, Untiered)", value=employee_data['Tier'])
+                new_tier = st.text_input(
+                    "Tier (A+, A, B, C, Untiered)", value=employee_data['Tier']
+                )
                 new_sip = st.text_input(
                     "BigS/SmallS", value=employee_data['BigS/SmallS']
                 )
@@ -261,6 +300,8 @@ def display_employee_card(employee_data,index):
                 cancelled = st.form_submit_button("Cancel")
 
                 if submitted:
+
+                    # Update text fields
                     df.at[index, "Name"] = str(new_name)
                     df.at[index, "Designation"] = str(new_designation)
                     df.at[index, "Contact No."] = int(new_contact)
@@ -270,15 +311,24 @@ def display_employee_card(employee_data,index):
                     df.at[index, "De-posted Date"] = new_depost_date
                     df.at[index, "Golf"] = str(new_golf)
                     df.at[index, "Golf Handicap"] = str(new_golf_handicap)
-                    df.at[index, "Dietary Restriction"] = str(new_dietary)
+                    df.at[index, "Dietary Restrictions"] = str(new_dietary)
                     df.at[index, "Reception"] = str(new_reception)
                     df.at[index, "Festivity"] = str(new_festivity)
                     df.at[index, "Interests"] = str(new_interest)
                     df.at[index, "Tier"] = str(new_tier)
                     df.at[index, "BigS/SmallS"] = str(new_sip)
                     df.at[index, "Status"] = str(new_status)
-                 
+
+                    # Updated image if new one is uploaded
+                    if new_photo is not None:
+                        new_image_path = f"images/{employee_data['Name'].replace(' ', '_').lower()}.jpg"
+                        with open(new_image_path, "wb") as f:
+                            f.write(new_photo.read())
+                        df.at[index, "Photo"] = new_image_path
+
+                    # Save df back to excel
                     df.to_excel("partners.xlsx", index=True)
+
                     st.success("Employee information updated successfully!")
                     st.session_state[f"edit_mode_{index}"] = False    
                     st.rerun()
@@ -304,29 +354,6 @@ last_modified_at = get_current_timestamp()
 #     """, 
 #     unsafe_allow_html=True
 # )
-
-# New addition - Display photo segment
-def display_photo(employee_data):
-    photo_path = employee_data.get('Photo', None) # Assuming 'Photo' is the column name
-
-    if photo_path and photo_path != 'Nil':
-        try:
-            # Try opening the image using PIL to handle various image formats
-            image = Image.open(photo_path)
-            # Convert to bytes for Streamlit
-            img_bytes = io.BytesIO()
-            image.save(img_bytes, format=image.format or "JPEG") # Save in original format or JPEG
-            img_bytes = img_bytes.getvalue()
-            return st.image(img_bytes, width = 150)
-        except Exception as e:
-            st.error(f"Error displaying image: {e}")
-            return st.image("👤", width = 150) # Placeholder image
-    
-    else:
-        return st.image("👤", width = 150) # Placeholder image
-
-# End of display photo segment
-
 
 # Display number of employee cards shown
 def display_employee_cards(df):
